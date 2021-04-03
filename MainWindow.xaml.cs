@@ -231,7 +231,15 @@ namespace AngryStare
                     File.Delete(csfile);
                 }
             }
-            
+            string DelFilepath3 = Directory.GetParent(Environment.CurrentDirectory).ToString() + @"\Technique\CallWinProCallBacK";
+            foreach (var csfile in Directory.GetFiles(DelFilepath3))
+            {
+                if (csfile.EndsWith("AssemblyInfo.cs") || csfile.EndsWith("Program.cs") || csfile.EndsWith("PEB.cs"))
+                {
+                    File.Delete(csfile);
+                }
+            }
+
 
         }
         public static void WirteProgramWithHT(string ProgramPath, string tech, string pebfile,bool MasqueradePEB) 

@@ -48,30 +48,6 @@ using System.IO;
                 readPEBEndStream.Close();
                 readPEBEnd.Close();
             }
-
-           //File.Copy(Directory.GetParent(Environment.CurrentDirectory).ToString() + "\\HatTrick\\PEB.cs", ProgramPath + @"\PEB.cs", true);
-
-    //        FileStream fs = new FileStream(ProgramPath + @"\Program.cs",FileMode.Create);
-    //        StreamWriter sw = new StreamWriter(fs);
-    //        sw.WriteLine(@"using System;
-    //        using System.Collections.Generic;
-    //        using System.Text;");
-
-    //        sw.WriteLine($"namespace {tech}");
-    //        sw.WriteLine(@"    {
-    //    class Program
-    //    {
-    //        static void Main(string[] args)
-    //        {");
-    //        sw.WriteLine($"PEB peb = new PEB(@\"{pebfile}\");");
-
-           
-    //        sw.WriteLine(@"Execute.Exec();
-    //        }
-    //    }
-    //}");
-    //        sw.Close();
-    //        fs.Close();
             
         }
     }
