@@ -9,7 +9,7 @@ namespace AngryStare.UI
 {
     class WriteProgram
     {
-        public static void WritePebProgram(string ProgramPath,string tech,string pebfile) 
+        public static void WritePebCS(string ProgramPath,string tech,string pebfile) 
         {
             /// 写入头部部分
             FileStream copyPEBHeader = new FileStream(ProgramPath + @"\PEB.cs", FileMode.Create);
@@ -51,27 +51,27 @@ using System.IO;
 
            //File.Copy(Directory.GetParent(Environment.CurrentDirectory).ToString() + "\\HatTrick\\PEB.cs", ProgramPath + @"\PEB.cs", true);
 
-            FileStream fs = new FileStream(ProgramPath + @"\Program.cs",FileMode.Create);
-            StreamWriter sw = new StreamWriter(fs);
-            sw.WriteLine(@"using System;
-            using System.Collections.Generic;
-            using System.Text;");
+    //        FileStream fs = new FileStream(ProgramPath + @"\Program.cs",FileMode.Create);
+    //        StreamWriter sw = new StreamWriter(fs);
+    //        sw.WriteLine(@"using System;
+    //        using System.Collections.Generic;
+    //        using System.Text;");
 
-            sw.WriteLine($"namespace {tech}");
-            sw.WriteLine(@"    {
-        class Program
-        {
-            static void Main(string[] args)
-            {");
-            sw.WriteLine($"PEB peb = new PEB(@\"{pebfile}\");");
+    //        sw.WriteLine($"namespace {tech}");
+    //        sw.WriteLine(@"    {
+    //    class Program
+    //    {
+    //        static void Main(string[] args)
+    //        {");
+    //        sw.WriteLine($"PEB peb = new PEB(@\"{pebfile}\");");
 
            
-            sw.WriteLine(@"Execute.Exec();
-            }
-        }
-    }");
-            sw.Close();
-            fs.Close();
+    //        sw.WriteLine(@"Execute.Exec();
+    //        }
+    //    }
+    //}");
+    //        sw.Close();
+    //        fs.Close();
             
         }
     }

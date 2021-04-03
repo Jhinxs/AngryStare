@@ -27,6 +27,7 @@ namespace AngryStare
     {
         public string SelectTechPath;
         public string IconPath;
+        public string MasPebOriginFile;
         public MainWindow()
         {
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
@@ -52,7 +53,15 @@ namespace AngryStare
             }
             catch (Exception ex) { Console.WriteLine(ex); }
             // MessageBox.Show(outputfile.Text);
-            
+            //MessageBox.Show(MasPebOriginFile);
+            //MessageBox.Show(((bool)MasqueradePEB.IsChecked).ToString());
+
+            ///
+            /// 写入Hattrick所需cs文件
+            ///
+            WirteProgramWithHT(SelectTechPath + '\\' + Combo_Tech.Text, Combo_Tech.SelectedItem.ToString(), MasPebOriginFile,(bool)MasqueradePEB.IsChecked);
+
+
 
             try
             {
@@ -186,18 +195,25 @@ namespace AngryStare
         private void MasqueradePEB_Checked(object sender, RoutedEventArgs e)
         {
             ClearLog();
+            
             if (Combo_Tech.SelectedItem == null) { Console.WriteLine("ERROR : Choose a Technique"); return; }
             OpenFileDialog openFileDialog = new OpenFileDialog();
             openFileDialog.Multiselect = false;
             openFileDialog.Filter = "exe file (*.exe)|*.exe";
             openFileDialog.ShowDialog();
-            string OriginFile = openFileDialog.FileName;
-            if (OriginFile == "") { return; }
-            WriteProgram.WritePebProgram(SelectTechPath + '\\' + Combo_Tech.Text, Combo_Tech.SelectedItem.ToString(), OriginFile);
-            Console.WriteLine(@"[+] MasqueradePEB From： " + OriginFile);
+            MasPebOriginFile = openFileDialog.FileName;
+            if (MasPebOriginFile == "") { return; }
+            WriteProgram.WritePebCS(SelectTechPath + '\\' + Combo_Tech.Text, Combo_Tech.SelectedItem.ToString(), MasPebOriginFile);
+            Console.WriteLine(@"[+] MasqueradePEB From： " + MasPebOriginFile);
+        }
+        private void MasqueradePEB_UNChecked(object sender, RoutedEventArgs e)
+        {
+
+            MasPebOriginFile = string.Empty;
+            
         }
 
-        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+            private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             string DelFilepath1 = Directory.GetParent(Environment.CurrentDirectory).ToString()+@"\Technique\MySyscall";
             foreach(var csfile in Directory.GetFiles(DelFilepath1))
@@ -216,6 +232,38 @@ namespace AngryStare
                 }
             }
             
+
+        }
+        public static void WirteProgramWithHT(string ProgramPath, string tech, string pebfile,bool MasqueradePEB) 
+        {
+            String MasqueradePEBString = string.Empty;
+
+            FileStream fs = new FileStream(ProgramPath + @"\Program.cs", FileMode.Create);
+            StreamWriter sw = new StreamWriter(fs);
+            if (MasqueradePEB) 
+            {
+                MasqueradePEBString = $"PEB peb = new PEB(@\"{pebfile}\");";
+            }
+            sw.WriteLine(@"using System;
+            using System.Collections.Generic;
+            using System.Text;");
+
+            sw.WriteLine($"namespace {tech}");
+            sw.WriteLine(@"    {
+        class Program
+        {
+            static void Main(string[] args)
+            {");
+            sw.WriteLine(MasqueradePEBString);
+
+
+            sw.WriteLine(@"Execute.Exec();
+            }
+        }
+    }");
+            sw.Close();
+            fs.Close();
+
 
         }
     }
