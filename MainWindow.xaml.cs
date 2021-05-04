@@ -28,6 +28,11 @@ namespace AngryStare
         public string SelectTechPath;
         public string IconPath;
         public string MasPebOriginFile;
+        public string[] BufferString;
+        public byte[] BuffByte;
+        public bool UseRaw = false;
+
+
         public MainWindow()
         {
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
@@ -52,9 +57,7 @@ namespace AngryStare
                 Console.WriteLine("[+] Generating template Successful");
             }
             catch (Exception ex) { Console.WriteLine(ex); }
-            // MessageBox.Show(outputfile.Text);
-            //MessageBox.Show(MasPebOriginFile);
-            //MessageBox.Show(((bool)MasqueradePEB.IsChecked).ToString());
+
 
             ///
             /// 写入Hattrick所需cs文件
@@ -107,23 +110,31 @@ namespace AngryStare
         }
         public byte[] GetBuffer()
         {
-
-            string[] BufferString = shellcodeText.Text.Split(',');
-            List<byte> BufferList = new List<byte>();
-
-            for (int i = 0; i < BufferString.Length; i++)
+            if ((Rawbinpath.Text != "") && shellcodeText.IsReadOnly)
             {
-                BufferString[i] = BufferString[i].Trim();
-            }
-
-            for (int i = 0; i < BufferString.Length; i++)
-            {
-                BufferList.Add(Convert.ToByte(BufferString[i], 16));
+                BuffByte = File.ReadAllBytes(Rawbinpath.Text);
+                return BuffByte;
 
             }
-            byte[] BuffByte = BufferList.ToArray();
+            else
+            {
+                BufferString = shellcodeText.Text.Split(',');
+                List<byte> BufferList = new List<byte>();
 
-            return BuffByte;
+                for (int i = 0; i < BufferString.Length; i++)
+                {
+                    BufferString[i] = BufferString[i].Trim();
+                }
+
+                for (int i = 0; i < BufferString.Length; i++)
+                {
+                    BufferList.Add(Convert.ToByte(BufferString[i], 16));
+
+                }
+                BuffByte = BufferList.ToArray();
+
+                return BuffByte;
+            }
         }
 
         private void Combo_Tech_SelectionChanged(object sender, SelectionChangedEventArgs e)
@@ -213,7 +224,7 @@ namespace AngryStare
             
         }
 
-            private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
+        private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
             string DelFilepath1 = Directory.GetParent(Environment.CurrentDirectory).ToString()+@"\Technique\MySyscall";
             foreach(var csfile in Directory.GetFiles(DelFilepath1))
@@ -274,5 +285,19 @@ namespace AngryStare
 
 
         }
+
+        public void Rawbinpath_Drop(object sender, DragEventArgs e)
+        {
+
+            var dropFile = ((System.Array)e.Data.GetData(System.Windows.DataFormats.FileDrop)).GetValue(0).ToString();
+            Rawbinpath.Text = dropFile;
+            shellcodeText.IsReadOnly = true;
+            shellcodeText.Text = "";
+            shellcodeText.Background = Brushes.DarkGray;
+            UseRaw = true;
+
+        }
+
+
     }
 }

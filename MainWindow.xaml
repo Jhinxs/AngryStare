@@ -5,13 +5,26 @@
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:materialDesign="http://materialdesigninxaml.net/winfx/xaml/themes"
         xmlns:local="clr-namespace:AngryStare"
-        Title="AngryStare" Height="580" Width="805" FontFamily="UI/#dosis" Closing="Window_Closing">
-    <Grid Background="#181735">
+        Title="AngryStare" Height="654.4" Width="805" FontFamily="UI/#dosis" Closing="Window_Closing" AllowDrop="True" DragDrop.Drop="Rawbinpath_Drop">
+    <Grid Background="#181735" Margin="0,0,0.4,-0.2">
         <StackPanel Margin="0,0,-0.4,330.4" Background="#181735" >
             <TextBlock HorizontalAlignment="Left" Text="Shellcode" FontSize="14" FontWeight="ExtraBold" Margin="10,10,10,0" Foreground="White" />
             <TextBox Name="shellcodeText" FontFamily="Consolas" FontSize="12" FontWeight="Bold" AcceptsReturn="True" TextWrapping="Wrap" Margin="10,5,10,0" Height="50" Background="#FF434343" Foreground="White">0xfc,0xfc,0xfc</TextBox>
+
+            <TextBlock HorizontalAlignment="Left" Text="RAW" FontSize="14" FontWeight="ExtraBold" Margin="10,10,10,0" Foreground="White" />
+            <TextBox Name="Rawbinpath" IsReadOnly="True" FontFamily="Consolas" FontSize="15" FontWeight="Bold"  Margin="10,5,10,0" Height="30" Background="#FF434343" Foreground="White"></TextBox>
+
+
+
             <TextBlock Text="Techniques" FontSize="14" FontWeight="ExtraBold" Margin="10,10,10,0" Foreground="#FFF0F0F0" />
-            
+            <!--<ComboBox HorizontalAlignment="Left" Name="Techniques" FontFamily="Consolas" FontSize="12" FontWeight="Bold" Margin="10,5,0,0" Height="30" Width="400" BorderBrush="#FFAEAEAE" Foreground="White">
+                <ComboBox.Background>
+                    <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
+                        <GradientStop Color="#FFF0F0F0" Offset="0"/>
+                        <GradientStop Color="#FF141414" Offset="1"/>
+                    </LinearGradientBrush>
+                </ComboBox.Background>
+            </ComboBox>-->
             <ComboBox x:Name="Combo_Tech" SelectionChanged="Combo_Tech_SelectionChanged" materialDesign:HintAssist.Hint="Technique" materialDesign:HintAssist.HintOpacity=".26" IsEditable="True" HorizontalAlignment="Left" Margin="12,5,0,0" Height="30" Width="400" Foreground="White">
 
             </ComboBox>
@@ -19,7 +32,7 @@
             <TextBlock Text="CSC Compile Command" Margin="10,10" FontSize="14" FontWeight="ExtraBold" Foreground="#FFEEEEEE"/>
             <TextBox Name="CompileCommand" Block.TextAlignment="Left" Padding="0,9" FontFamily="Consolas" FontSize="16" FontWeight="Bold" AcceptsReturn="False" TextWrapping="NoWrap" Margin="10,0,9.6,5" Height="43" BorderBrush="#FFEBEBEB" Background="#FF3D3D3D" Foreground="White"/>
         </StackPanel>
-        <Grid ShowGridLines="False" Margin="10,220,9.6,235" Background="#181735">
+        <Grid ShowGridLines="False" Margin="10,294,9,236" Background="#181735">
             <Grid.RowDefinitions>
                 <RowDefinition Height="40"></RowDefinition>
                 <RowDefinition Height="40"></RowDefinition>
@@ -40,7 +53,7 @@
                 </Button>
             </Border>
         </Grid>
-        <Grid Margin="10,270,10,120">
+        <Grid Margin="10,346,10,120">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"></RowDefinition>
             </Grid.RowDefinitions>
@@ -63,7 +76,7 @@
                 <CheckBox VerticalAlignment="Center" Foreground="White">Test3</CheckBox>
             </Border>
         </Grid>
-        <Grid Margin="10,305,10,5" Background="#181735">
+        <Grid Margin="10,378,10,94.4" Background="#181735">
             <Grid.RowDefinitions>
                 <RowDefinition Height="auto"></RowDefinition>
             </Grid.RowDefinitions>
