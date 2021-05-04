@@ -24,6 +24,16 @@ namespace AngryStare.DealWithShellcode
             sw.WriteLine(@"{");
             sw.WriteLine(@"class GetCode");
             sw.WriteLine(@"{");
+
+            if (AngryStare.MainWindow.UseRaw == true)
+            {
+                sw.WriteLine("public static bool UseRaw = true;");
+            }
+            else 
+            {
+                sw.WriteLine("public static bool UseRaw = false;");
+            }
+             
             sw.WriteLine("public static Stack<byte> CodeStack()");
             sw.WriteLine("{");
             sw.WriteLine("   Stack<byte> st = new Stack<byte>();");

