@@ -17,14 +17,7 @@
 
 
             <TextBlock Text="Techniques" FontSize="14" FontWeight="ExtraBold" Margin="10,10,10,0" Foreground="#FFF0F0F0" />
-            <!--<ComboBox HorizontalAlignment="Left" Name="Techniques" FontFamily="Consolas" FontSize="12" FontWeight="Bold" Margin="10,5,0,0" Height="30" Width="400" BorderBrush="#FFAEAEAE" Foreground="White">
-                <ComboBox.Background>
-                    <LinearGradientBrush EndPoint="0,1" StartPoint="0,0">
-                        <GradientStop Color="#FFF0F0F0" Offset="0"/>
-                        <GradientStop Color="#FF141414" Offset="1"/>
-                    </LinearGradientBrush>
-                </ComboBox.Background>
-            </ComboBox>-->
+
             <ComboBox x:Name="Combo_Tech" SelectionChanged="Combo_Tech_SelectionChanged" materialDesign:HintAssist.Hint="Technique" materialDesign:HintAssist.HintOpacity=".26" IsEditable="True" HorizontalAlignment="Left" Margin="12,5,0,0" Height="30" Width="400" Foreground="White">
 
             </ComboBox>
