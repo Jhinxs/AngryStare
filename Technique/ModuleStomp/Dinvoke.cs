@@ -4,11 +4,12 @@ using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading.Tasks;
 
-namespace NETDelegate
+namespace ModuleStomp
 {
     class Dinvoke
-    {   
+    {
 
         /// get func pointer by apihash
         /// </summary>
@@ -52,7 +53,7 @@ namespace NETDelegate
                     Int32 expFuncNameOrdinal = Marshal.ReadInt16((IntPtr)(DosHeader + AddressOfNameOrdinals + i * 2)) + IMAGE_DIRECTORY_ENTRY_EXPORT_BASE;
                     Int32 expFuncNameRVA = Marshal.ReadInt32((IntPtr)(DosHeader + AddressofFunctions + (4 * (expFuncNameOrdinal - IMAGE_DIRECTORY_ENTRY_EXPORT_BASE))));
                     FuncPtr = (IntPtr)((Int64)DosHeader + expFuncNameRVA);
-                  //  Console.WriteLine(ExpFuncName + ":" + FuncPtr);
+                    //  Console.WriteLine(ExpFuncName + ":" + FuncPtr);
                     break;
                 }
             }
@@ -60,22 +61,22 @@ namespace NETDelegate
         }
         public static IntPtr GetModuleAddress(string DLLName)
         {
-           
+
             ProcessModuleCollection modules = Process.GetCurrentProcess().Modules;
             foreach (ProcessModule pm in modules)
             {
 
                 if (pm.ModuleName.ToLower() == DLLName.ToLower())
                 {
-                    
+
                     return pm.BaseAddress;
                 }
 
             }
-            
+
             return IntPtr.Zero;
         }
-        public static string GetHashFromAPI(string api) 
+        public static string GetHashFromAPI(string api)
         {
 
             return api.GetHashCode().ToString("x");

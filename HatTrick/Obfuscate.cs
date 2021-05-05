@@ -72,7 +72,7 @@ namespace AngryStare.HatTrick
                                 // c# variable has for loop scope only
                                 String regString = method.Body.Instructions[i].Operand.ToString();
                                 String encString = Convert.ToBase64String(UTF8Encoding.UTF8.GetBytes(regString));
-                                Console.WriteLine($"{regString} -> {encString}");
+                               // Console.WriteLine($"{regString} -> {encString}");
                                 // methodology for adding code: write it in plain c#, compile, then view IL in dnspy
                                 method.Body.Instructions[i].OpCode = OpCodes.Nop; // errors occur if instruction not replaced with Nop
                                 method.Body.Instructions.Insert(i + 1, new Instruction(OpCodes.Call, md.Import(typeof(System.Text.Encoding).GetMethod("get_UTF8", new Type[] { })))); // Load string onto stack
@@ -101,7 +101,7 @@ namespace AngryStare.HatTrick
                         if (method.IsConstructor) continue;
 
                         string encName = RandomString(10);
-                        Console.WriteLine($"{method.Name} -> {encName}");
+                       // Console.WriteLine($"{method.Name} -> {encName}");
                         method.Name = encName;
                     }
                 }
@@ -112,7 +112,7 @@ namespace AngryStare.HatTrick
                 foreach (var type in md.GetTypes())
                 {
                     string encName = RandomString(10);
-                    Console.WriteLine($"{type.Name} -> {encName}");
+                   // Console.WriteLine($"{type.Name} -> {encName}");
                     type.Name = encName;
                 }
 
@@ -123,7 +123,7 @@ namespace AngryStare.HatTrick
                 foreach (var type in md.GetTypes())
                 {
                     string encName = RandomString(10);
-                    Console.WriteLine($"{type.Namespace} -> {encName}");
+                  //  Console.WriteLine($"{type.Namespace} -> {encName}");
                     type.Namespace = encName;
                 }
 
@@ -133,7 +133,7 @@ namespace AngryStare.HatTrick
             {
                 // obfuscate assembly name
                 string encName = RandomString(10);
-                Console.WriteLine($"{md.Assembly.Name} -> {encName}");
+              //  Console.WriteLine($"{md.Assembly.Name} -> {encName}");
                 md.Assembly.Name = encName;
 
                 // obfuscate Assembly Attributes(AssemblyInfo) .rc file
@@ -150,11 +150,7 @@ namespace AngryStare.HatTrick
                 }
             }
 
-            /// <summary>
-            /// Obfuscate ECMA CIL (.NET IL) assemblies by obfuscating names of methods, classes, namespaces, assemblyInfo and encoding strings
-            /// </summary>
-            /// <param name="inFile">The .Net assembly path you want to obfuscate</param>
-            /// <param name="outFile">Path to the newly obfuscated file, default is "inFile".obfuscated</param>
+
             public  static void obfuscateStart(string inFile, string outFile)
             {
                 if (inFile == "" || outFile == "") return;
@@ -170,21 +166,13 @@ namespace AngryStare.HatTrick
                 obfuscateMethods(md);
                 obfuscateClasses(md);
                 obfuscateNamespace(md);
-                //obfuscateAssemblyInfo(md);
-                //obfuscateVariables(md); // md.Write already simplifies variable names to there type in effect mangling them i.e: aesSetup -> aes1, aesRun -> aes2
-                //obfuscateComments(md); // comments are stripped during compile opitmization
+
 
                 cleanAsm(md);
 
                 md.Write(outFile);
                 md.Dispose();
             }
-
-            /// <summary>
-            /// Obfuscate ECMA CIL (.NET IL) assemblies to evade Windows Defender AMSI 
-            /// </summary>
-            /// <param name="inFile">The .Net assembly path you want to obfuscate</param>
-            /// <param name="outFile">Path to the newly obfuscated file, default is "inFile".obfuscated</param>
 
         
     }

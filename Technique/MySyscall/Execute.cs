@@ -12,7 +12,7 @@ namespace MySyscall
     class Execute
     {
         public static byte[] mybytearr;
-        public static void Exec() 
+        public static void exec() 
         {
             if (GetCode.UseRaw == true)
             {
