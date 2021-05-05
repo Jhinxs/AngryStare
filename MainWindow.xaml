@@ -21,6 +21,12 @@
             <ComboBox x:Name="Combo_Tech" SelectionChanged="Combo_Tech_SelectionChanged" materialDesign:HintAssist.Hint="Technique" materialDesign:HintAssist.HintOpacity=".26" IsEditable="True" HorizontalAlignment="Left" Margin="12,5,0,0" Height="30" Width="400" Foreground="White">
 
             </ComboBox>
+            <ComboBox x:Name="dllorexe" SelectionChanged="dllorexe_SelectionChanged" materialDesign:HintAssist.Hint="Technique" materialDesign:HintAssist.HintOpacity=".26" IsEditable="True" HorizontalAlignment="Left" Margin="450,-31,0,0" Height="30" Width="100" Foreground="White">
+
+            </ComboBox>
+
+
+
 
             <TextBlock Text="CSC Compile Command" Margin="10,10" FontSize="14" FontWeight="ExtraBold" Foreground="#FFEEEEEE"/>
             <TextBox Name="CompileCommand" Block.TextAlignment="Left" Padding="0,9" FontFamily="Consolas" FontSize="16" FontWeight="Bold" AcceptsReturn="False" TextWrapping="NoWrap" Margin="10,0,9.6,5" Height="43" BorderBrush="#FFEBEBEB" Background="#FF3D3D3D" Foreground="White"/>
@@ -95,7 +101,7 @@
                     MetaData
                 </Button>
             </Border>
-            
+
 
         </Grid>
 
