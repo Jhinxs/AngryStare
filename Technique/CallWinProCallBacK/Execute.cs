@@ -85,22 +85,6 @@ namespace CallWinProCallBacK
             PAGE_NOCACHE = 0x00000200,
             PAGE_WRITECOMBINE = 0x00000400
         }
-        //public static byte[] GetEmbeddedBin(string resourcesName) 
-        //{
-
-        //    var EmbeddedRes = Assembly.GetExecutingAssembly();
-
-        //    using (var rs = EmbeddedRes.GetManifestResourceStream(resourcesName))
-        //    {
-
-        //        byte[] ba = new byte[rs.Length];
-        //        // rs.Write(ba, 0, ba.Length);
-        //        rs.Read(ba, 0, ba.Length);
-        //        return ba;
-        //    }
-
-        //}
-
         public static byte[] GetEmbeddedBin(string resourcesName)
         {
 
