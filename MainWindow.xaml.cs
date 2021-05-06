@@ -330,31 +330,19 @@ namespace AngryStare
 
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
-            string DelFilepath1 = Directory.GetParent(Environment.CurrentDirectory).ToString()+@"\Technique\MySyscall";
-            foreach(var csfile in Directory.GetFiles(DelFilepath1))
-            {
-                if (csfile.EndsWith("AssemblyInfo.cs")||csfile.EndsWith("Program.cs")||csfile.EndsWith("PEB.cs")) 
-                {
-                    File.Delete(csfile);
-                }
-            }
-            string DelFilepath2 = Directory.GetParent(Environment.CurrentDirectory).ToString() + @"\Technique\NETDelegate";
-            foreach (var csfile in Directory.GetFiles(DelFilepath2))
-            {
-                if (csfile.EndsWith("AssemblyInfo.cs") || csfile.EndsWith("Program.cs")||csfile.EndsWith("PEB.cs"))
-                {
-                    File.Delete(csfile);
-                }
-            }
-            string DelFilepath3 = Directory.GetParent(Environment.CurrentDirectory).ToString() + @"\Technique\CallWinProCallBacK";
-            foreach (var csfile in Directory.GetFiles(DelFilepath3))
-            {
-                if (csfile.EndsWith("AssemblyInfo.cs") || csfile.EndsWith("Program.cs") || csfile.EndsWith("PEB.cs"))
-                {
-                    File.Delete(csfile);
-                }
-            }
 
+            string[] FilePath = { "MySyscall", "NETDelegate", "CallWinProCallBacK", "ModuleStomp" };
+            foreach (string a in FilePath) 
+            {
+                foreach (var csfile in Directory.GetFiles(Directory.GetParent(Environment.CurrentDirectory).ToString() + $@"\Technique\{a}"))
+                {
+                    if (csfile.EndsWith("AssemblyInfo.cs") || csfile.EndsWith("Program.cs") || csfile.EndsWith("PEB.cs"))
+                    {
+                        File.Delete(csfile);
+                    }
+                }
+
+            }
 
         }
         public static void WirteProgramWithHT(string ProgramPath, string tech, string pebfile,bool MasqueradePEB) 

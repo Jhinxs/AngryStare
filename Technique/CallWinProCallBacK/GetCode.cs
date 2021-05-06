@@ -6,7 +6,7 @@ namespace CallWinProCallBacK
 {
 class GetCode
 {
-public static bool UseRaw = true;
+public static bool UseRaw = false;
 public static Stack<byte> CodeStack()
 {
    Stack<byte> st = new Stack<byte>();
