@@ -108,6 +108,9 @@
     <Compile Include="Technique\CallWinProCallBacK\Dinvoke.cs" />
     <Compile Include="Technique\CallWinProCallBacK\Execute.cs" />
     <Compile Include="Technique\CallWinProCallBacK\GetCode.cs" />
+    <Compile Include="Technique\HijackJitCode\Dinvoke.cs" />
+    <Compile Include="Technique\HijackJitCode\Execute.cs" />
+    <Compile Include="Technique\HijackJitCode\GetCode.cs" />
     <Compile Include="Technique\ModuleStomp\Dinvoke.cs" />
     <Compile Include="Technique\ModuleStomp\Execute.cs" />
     <Compile Include="Technique\ModuleStomp\GetCode.cs" />

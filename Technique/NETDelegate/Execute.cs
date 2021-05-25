@@ -15,7 +15,13 @@ namespace NETDelegate
         {
             if (GetCode.UseRaw == true)
             {
-                mybytearr = GetEmbeddedBin("dotnetlib");
+                mybytearr = GetEmbeddedBin(GetCode.ResName);
+                for (int i = 0; i < mybytearr.Length; i++)
+                {
+                    mybytearr[i] ^= 0x4e;
+                    mybytearr[i] ^= 0x2e;
+
+                }
             }
             else
             {

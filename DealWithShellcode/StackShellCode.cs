@@ -9,7 +9,7 @@ namespace AngryStare.DealWithShellcode
 {
     class StackShellCode
     {
-        public static void StackGen(byte[] shellcodebyte,string path,string tech_namespace)
+        public static void StackGen(byte[] shellcodebyte,string path,string tech_namespace,string ResName)
         {
          
             byte[] shellcode = shellcodebyte;
@@ -28,6 +28,7 @@ namespace AngryStare.DealWithShellcode
             if (AngryStare.MainWindow.UseRaw == true)
             {
                 sw.WriteLine("public static bool UseRaw = true;");
+                sw.WriteLine($"public static string ResName = \"{ResName}\";");
             }
             else 
             {

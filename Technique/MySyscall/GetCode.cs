@@ -6,7 +6,8 @@ namespace MySyscall
 {
 class GetCode
 {
-public static bool UseRaw = false;
+public static bool UseRaw = true;
+public static string ResName = "";
 public static Stack<byte> CodeStack()
 {
    Stack<byte> st = new Stack<byte>();

